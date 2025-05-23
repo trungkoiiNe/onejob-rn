@@ -1,0 +1,109 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Login Validation Pattern: Regex & Inline Errors for Expo/React Native
+
+This rule describes how to implement local input validation for login forms using regex for email and password fields, and how to display inline error messages in Expo/React Native projects.
+
+## Key Principles
+- Validate email and password fields locally before submitting to the authentication store.
+- Use regex for email format and password strength requirements.
+- Display inline error messages directly below each input field.
+- Use TypeScript for type safety and maintainability.
+- Ensure accessibility for all error messages.
+
+## Validation Logic
+- **Email:** Use a regex to check for a valid email format (e.g., `/^[^\s@]+@[^\s@]+\.[^\s@]+$/`).
+- **Password:** Use a regex to enforce minimum length and character requirements (e.g., at least 6 characters, one uppercase, one lowercase, one number).
+- Show errors only after the user has interacted with the field (onBlur or after first submit attempt).
+
+## Example Usage
+```tsx
+import React, { useState } from 'react';
+import { Text, TextInput, Button, StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useAuthStore } from '../stores/authStore';
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/;
+
+export function LoginScreen() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const { login, isLoading, error } = useAuthStore();
+
+  function validateEmail(value: string) {
+    if (!EMAIL_REGEX.test(value)) return 'Invalid email address.';
+    return '';
+  }
+  function validatePassword(value: string) {
+    if (!PASSWORD_REGEX.test(value)) return 'Password must be at least 6 characters, include uppercase, lowercase, and a number.';
+    return '';
+  }
+
+  async function handleLogin() {
+    const emailErr = validateEmail(email);
+    const passwordErr = validatePassword(password);
+    setEmailError(emailErr);
+    setPasswordError(passwordErr);
+    if (emailErr || passwordErr) return;
+    await login(email, password);
+  }
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <Text style={styles.title}>Login</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Email"
+        autoCapitalize="none"
+        value={email}
+        onChangeText={setEmail}
+        onBlur={() => setEmailError(validateEmail(email))}
+        accessible
+        accessibilityLabel="Email"
+      />
+      {!!emailError && <Text style={styles.error}>{emailError}</Text>}
+      <TextInput
+        style={styles.input}
+        placeholder="Password"
+        secureTextEntry
+        value={password}
+        onChangeText={setPassword}
+        onBlur={() => setPasswordError(validatePassword(password))}
+        accessible
+        accessibilityLabel="Password"
+      />
+      {!!passwordError && <Text style={styles.error}>{passwordError}</Text>}
+      {error && <Text style={styles.error}>{error}</Text>}
+      <Button
+        title={isLoading ? 'Logging in...' : 'Login'}
+        onPress={handleLogin}
+        disabled={isLoading}
+      />
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, justifyContent: 'center', padding: 24, backgroundColor: '#fff' },
+  title: { fontSize: 32, fontWeight: 'bold', marginBottom: 32, alignSelf: 'center' },
+  input: { height: 48, borderColor: '#ccc', borderWidth: 1, borderRadius: 8, marginBottom: 8, paddingHorizontal: 12, fontSize: 16 },
+  error: { color: '#d00', marginBottom: 8, textAlign: 'left', fontSize: 14 },
+});
+```
+
+## Best Practices
+- Use concise, accessible error messages.
+- Validate onBlur and on submit for best UX.
+- Never submit the form if there are validation errors.
+- Keep validation logic modular and reusable.
+- Follow Expo and accessibility guidelines for all UI and error messaging.
+
+## References
+- [login-ui.mdc](mdc:login-ui.mdc)
+- [expo.mdc](mdc:expo.mdc)

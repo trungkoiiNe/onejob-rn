@@ -1,0 +1,40 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Authentication Store Pattern: Zustand + Supabase + MMKV
+
+This project uses a modular authentication store pattern for Expo/React Native apps, combining:
+- [Zustand](https://docs.pmnd.rs/zustand/getting-started/introduction) for state management
+- [Supabase](https://supabase.com/docs/reference/javascript/auth-signinwithpassword) for backend authentication
+- [react-native-mmkv](https://github.com/mrousavy/react-native-mmkv) for fast, persistent storage
+
+## Key Files
+- [stores/authStore.ts](mdc:stores/authStore.ts): Main Zustand store for authentication state and actions
+
+## Store Structure
+- State: `user`, `isAuthenticated`, `isLoading`, `error`
+- Actions: `login`, `logout`, `checkAuth`
+- All state and actions are typed with TypeScript interfaces
+
+## Best Practices
+- Use async actions for login/logout to handle Supabase API calls
+- Store auth tokens and user info securely in MMKV
+- On app start, `checkAuth` should restore session from MMKV and validate with Supabase
+- Never store plain passwords or sensitive data in state
+- Use Expo's secure storage guidelines for sensitive data
+- Handle loading and error states for all async actions
+
+## Example Usage
+```ts
+import { useAuthStore } from '../stores/authStore';
+
+const { login, logout, isAuthenticated, user } = useAuthStore();
+```
+
+## References
+- [authStore.ts](mdc:stores/authStore.ts)
+- [Supabase Auth Docs](https://supabase.com/docs/guides/auth)
+- [MMKV Docs](https://github.com/mrousavy/react-native-mmkv)
+- [Expo Security](https://docs.expo.dev/guides/security/)
