@@ -29,7 +29,7 @@ export default function AuthScreen() {
         try {
             await signInWithGoogle();
         } catch (error) {
-            console.error('Google sign in failed:', error);
+            // console.error('Google sign in failed:', error);
         }
     };
 

@@ -11,6 +11,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Feather, Ionicons } from '@expo/vector-icons';
 import { useAuthStore } from '@/stores';
+import { router } from 'expo-router';
 
 const { width } = Dimensions.get('window');
 
@@ -129,25 +130,23 @@ export default function EmployerDashboard() {
               title="Post New Job"
               icon="plus-circle"
               color="#10b981"
-              onPress={() => { }}
+              onPress={() => { router.push('/employer/jobs'); }}
             />
             <QuickAction
               title="Review Applications"
               icon="clipboard"
               color="#3b82f6"
-              onPress={() => { }}
-            />
-            <QuickAction
+              onPress={() => { router.push('/employer/applications'); }}
+            /><QuickAction
               title="Schedule Interview"
               icon="calendar"
               color="#f59e0b"
-              onPress={() => { }}
-            />
-            <QuickAction
+              onPress={() => { router.push('/employer/jobs'); }}
+            /><QuickAction
               title="Company Profile"
               icon="settings"
               color="#8b5cf6"
-              onPress={() => { }}
+              onPress={() => { router.push('/employer/company'); }}
             />
           </View>
         </View>

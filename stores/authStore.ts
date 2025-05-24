@@ -99,7 +99,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             const { error: dbError } = await supabase
                 .from('users_data')
                 .upsert({
-                    id: data.user.id,
+                    user_id: data.user.id,
                     email: data.user.email,
                     name: data.user.user_metadata.full_name,
                     phone: data.user.user_metadata.phone,
@@ -116,17 +116,18 @@ export const useAuthStore = create<AuthState>((set, get) => ({
                 console.error('Database error:', dbError);
                 throw dbError;
             }
-            // Do not return data to match the type Promise<void>
-        } catch (error) {
-            console.error('Google sign in error:', error);
+            // Do not return data to match the type Promise<void>        } catch (error) {
+            // console.error('Google sign in error:', error);
             if (error.code === statusCodes.SIGN_IN_CANCELLED) {
-                set({ error: 'Sign in was cancelled' });
+                // User cancelled the sign-in process, handle gracefully
+                set({ error: null });
+                return; // Return without throwing to avoid crashing
             } else if (error.code === statusCodes.IN_PROGRESS) {
                 set({ error: 'Sign in is already in progress' });
             } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
                 set({ error: 'Google Play Services are not available' });
             } else {
-                set({ error: error instanceof Error ? error.message : 'Unknown error occurred' });
+                // set({ error: error instanceof Error ? error.message : 'Unknown error occurred' });
             }
             throw error;
         } finally {
@@ -182,7 +183,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             const { data, error } = await supabase
                 .from('users_data')
                 .select('role')
-                .eq('id', get().user?.id)
+                .eq('user_id', get().user?.id)
                 .single();
 
             if (error) {
